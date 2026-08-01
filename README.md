@@ -36,12 +36,14 @@ Tarabut checks the installed Frappe, ERPNext, and connector versions during auth
 Run these commands from your Bench directory:
 
 ```bash
-bench get-app https://github.com/tarabut-app/tarabut-frappe-integration
+git clone https://github.com/tarabut-app/tarabut-frappe-integration apps/tarabut_connector
+./env/bin/pip install --editable apps/tarabut_connector
+grep -qxF tarabut_connector sites/apps.txt || echo tarabut_connector >> sites/apps.txt
 bench --site your-site.example install-app tarabut_connector
 bench --site your-site.example migrate
 ```
 
-Replace `your-site.example` with your ERPNext site name.
+The `apps/tarabut_connector` destination is required because the public repository name and the Frappe app name are intentionally different. Replace `your-site.example` with your ERPNext site name.
 
 ## Connect ERPNext to Tarabut
 

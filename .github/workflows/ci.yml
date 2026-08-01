@@ -64,7 +64,9 @@ jobs:
           bench init --skip-assets --frappe-branch "${{ matrix.branch }}" frappe-bench
           cd frappe-bench
           bench get-app --branch "${{ matrix.branch }}" erpnext https://github.com/frappe/erpnext
-          bench get-app tarabut_connector "$GITHUB_WORKSPACE"
+          ln -s "$GITHUB_WORKSPACE" apps/tarabut_connector
+          ./env/bin/pip install --editable apps/tarabut_connector
+          echo tarabut_connector >> sites/apps.txt
         working-directory: ${{ runner.temp }}
       - name: Create site and install apps
         run: |
