@@ -67,6 +67,9 @@ jobs:
           ln -s "$GITHUB_WORKSPACE" apps/tarabut_connector
           ./env/bin/pip install --editable apps/tarabut_connector
           printf '\ntarabut_connector\n' >> sites/apps.txt
+          bench set-config --global redis_cache redis://127.0.0.1:6379
+          bench set-config --global redis_queue redis://127.0.0.1:6379
+          bench set-config --global redis_socketio redis://127.0.0.1:6379
         working-directory: ${{ runner.temp }}
       - name: Create site and install apps
         run: |
