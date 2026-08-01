@@ -4,7 +4,7 @@ app_publisher = "Tarabut"
 app_description = "Frappe and ERPNext integration for Tarabut marketplace sync"
 app_email = "dev@tarabut.app"
 app_license = "MIT"
-app_logo_url = "/assets/tarabut_connector/images/tarabut-icon.svg"
+app_logo_url = "/assets/tarabut_connector/images/tarabut-icon.png"
 
 after_install = "tarabut_connector.install.after_install"
 
