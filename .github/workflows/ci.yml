@@ -1,0 +1,73 @@
+name: ERPNext compatibility
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install ruff==0.16.1
+      - run: ruff check tarabut_connector
+      - run: ruff format --check tarabut_connector
+
+  test:
+    timeout-minutes: 45
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - branch: version-15
+            python: "3.11"
+            node: "18"
+          - branch: version-16
+            python: "3.14"
+            node: "24"
+    services:
+      mariadb:
+        image: mariadb:10.6
+        env:
+          MARIADB_ROOT_PASSWORD: root
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd="redis-cli ping" --health-interval=10s
+          --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install Bench
+        run: pip install frappe-bench
+      - name: Create test Bench
+        run: |
+          bench init --skip-assets --frappe-branch "${{ matrix.branch }}" frappe-bench
+          cd frappe-bench
+          bench get-app --branch "${{ matrix.branch }}" erpnext https://github.com/frappe/erpnext
+          bench get-app tarabut_connector "$GITHUB_WORKSPACE"
+        working-directory: ${{ runner.temp }}
+      - name: Create site and install apps
+        run: |
+          bench new-site test.localhost --db-root-username root --db-root-password root --admin-password admin --no-mariadb-socket
+          bench --site test.localhost install-app erpnext
+          bench --site test.localhost install-app tarabut_connector
+        working-directory: ${{ runner.temp }}/frappe-bench
+      - name: Run connector tests
+        run: bench --site test.localhost run-tests --app tarabut_connector
+        working-directory: ${{ runner.temp }}/frappe-bench

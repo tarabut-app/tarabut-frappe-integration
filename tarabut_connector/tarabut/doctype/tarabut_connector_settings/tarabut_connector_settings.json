@@ -45,12 +45,16 @@
     {
       "fieldname": "tarabut_connection_id",
       "fieldtype": "Data",
-      "label": "Tarabut Connection ID"
+      "label": "Tarabut Connection ID",
+      "read_only": 1,
+      "description": "Assigned automatically when this ERPNext site is authorized in Tarabut."
     },
     {
       "fieldname": "webhook_secret",
       "fieldtype": "Password",
-      "label": "Webhook Secret"
+      "label": "Webhook Secret",
+      "read_only": 1,
+      "description": "Installed automatically and used to sign ERPNext event notifications."
     },
     {
       "fieldname": "defaults_section",
@@ -78,7 +82,7 @@
       "label": "Allow Creating Missing Items"
     },
     {
-      "default": "1",
+      "default": "0",
       "fieldname": "allow_create_parties",
       "fieldtype": "Check",
       "label": "Allow Creating Customers and Suppliers"

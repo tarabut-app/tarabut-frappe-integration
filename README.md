@@ -1,61 +1,39 @@
-# Tarabut / ترابط ERPNext Integration
+# Tarabut / ترابط for ERPNext
 
-[Tarabut](https://tarabut.app) is a wholesale commerce platform in Iraq. It connects traders with suppliers, factories, products, ordering, payment, delivery, and order tracking.
+[Tarabut](https://tarabut.app) is an Iraqi wholesale commerce platform that connects traders with suppliers and factories for product discovery, ordering, payment, delivery, and order tracking.
 
-This Frappe app lets an ERPNext site exchange order and catalog-related updates with Tarabut. It is intended for companies that use ERPNext and also sell or buy through Tarabut.
+This app connects an ERPNext company to Tarabut. It is for businesses that sell through Tarabut, buy through Tarabut, or do both.
 
-## What this app provides
+## What the integration does
 
-The app adds the ERPNext-side integration needed for Tarabut order sync.
+For a seller, the integration can:
 
-It can:
+- read selected ERPNext `Item`, `Item Price`, UOM, Warehouse, and `Bin` data;
+- import catalogue, selling prices, and warehouse availability into Tarabut for review;
+- keep approved catalogue mappings synchronized after ERPNext changes;
+- create one draft ERPNext `Sales Order` for each Tarabut seller order;
+- show the ERPNext document and its current status in the Tarabut seller panel.
 
-- Receive order sync requests from Tarabut.
-- Create ERPNext `Sales Order` documents for buyer/customer-side orders.
-- Create ERPNext `Purchase Order` documents for seller/supplier-side orders.
-- Track each sync request with an idempotency key so repeated requests do not create duplicate ERPNext documents.
-- Store sync payloads, linked ERPNext documents, status, and error details.
-- Store mappings between Tarabut entities and ERPNext documents.
-- Add Tarabut reference fields to ERPNext Sales Orders and Purchase Orders.
-- Notify Tarabut when selected ERPNext orders, item prices, or `Bin` records change.
+For a buyer, the integration can:
 
-## Who should install it
+- create one draft ERPNext `Purchase Order` per supplier for a Tarabut order set;
+- map Tarabut sellers to ERPNext Suppliers and purchased variants to ERPNext Items;
+- preserve the agreed Tarabut quantities, prices, discounts, shipping, and order references.
 
-Install this app if:
+Repeated requests use the same idempotency key, so a retry returns the original ERPNext document instead of creating a duplicate. The app also keeps mapping and sync-history records in the **Tarabut Integration** workspace.
 
-- You use ERPNext v15.
-- Your business needs to connect ERPNext with Tarabut.
-- You want Tarabut orders to appear inside ERPNext.
-- You want ERPNext changes such as order, item, price, or `Bin` updates to notify Tarabut.
+The first release creates draft orders only. It does not submit orders or create invoices, payments, delivery notes, purchase receipts, or stock entries.
 
-You do not need this app just to browse or use Tarabut as a regular trader from the Tarabut app.
+## Supported versions
 
-## Supported ERPNext documents
+- Frappe Framework 15 or 16
+- ERPNext 15 or 16
 
-The current version works with:
-
-- `Sales Order`
-- `Purchase Order`
-- `Item`
-- `Item Price`
-- `Bin`
-- `Customer`
-- `Supplier`
-
-`Sales Order` and `Purchase Order` are created from inbound Tarabut sync requests.
-
-`Item`, `Item Price`, and `Bin` changes can be sent back to Tarabut through webhook notifications.
-
-## Requirements
-
-- Frappe Framework v15 or later.
-- ERPNext v15 or later.
-- Bench access to your ERPNext site.
-- Tarabut integration credentials.
+Tarabut checks the installed Frappe, ERPNext, and connector versions during authorization and rejects unsupported major versions.
 
 ## Installation
 
-From your Bench directory:
+Run these commands from your Bench directory:
 
 ```bash
 bench get-app https://github.com/tarabut-app/tarabut-frappe-integration
@@ -65,182 +43,77 @@ bench --site your-site.example migrate
 
 Replace `your-site.example` with your ERPNext site name.
 
-## Setup in ERPNext
+## Connect ERPNext to Tarabut
 
-After installation, open ERPNext Desk and search for:
+### Recommended: OAuth 2
 
-```text
-Tarabut Connector Settings
-```
+1. In ERPNext, create a dedicated user and assign the **Tarabut Integration User** role.
+2. Open **OAuth Client** in ERPNext and create a client for that user.
+3. Set its redirect URI to:
 
-Configure:
+   ```text
+   https://api.tarabut.app/vendor/erp/oauth/callback
+   ```
 
-- `Enabled`
-- `Tarabut Connection ID`
-- `Webhook Secret`
-- `Default Item Group`
-- `Default UOM`
-- `Allow Creating Missing Items`
-- `Allow Creating Customers and Suppliers`
+4. In the Tarabut seller panel, open **Settings → ERPNext integration**.
+5. Enter the public HTTPS address of the ERPNext site, the ERPNext Company, OAuth client ID, and OAuth client secret. Tarabut generates and installs the webhook signing secret automatically.
+6. Continue to ERPNext, approve access, then return to Tarabut.
+7. Select the selling Price List, stock formula, ERPNext Warehouses, and the corresponding Tarabut stock location for every selected Warehouse.
+8. Save the settings and run the first full catalogue sync. Review the proposed changes before committing them.
 
-Recommended production settings:
+Tarabut stores access and refresh tokens encrypted and refreshes an expired access token automatically. The dedicated integration user should not be given unrelated ERPNext roles.
 
-- Use the production URL defaults unless Tarabut support asks you to change them.
-- Keep `Allow Creating Missing Items` disabled unless your Tarabut products already have clean ERPNext item codes or SKUs.
-- Use a dedicated ERPNext API user for Tarabut.
-- Store the webhook secret securely.
-- Use HTTPS for ERPNext and Tarabut endpoints.
+### API key compatibility mode
 
-`Tarabut Connection ID` and `Webhook Secret` are provided during Tarabut integration onboarding.
+If OAuth cannot be used on the ERPNext site, create API credentials for a dedicated user with the **Tarabut Integration User** role and choose **API key and secret** on the integration page.
 
-`Tarabut Connection ID` tells Tarabut which ERPNext connection is sending or receiving data.
+## ERPNext settings and workspace
 
-`Webhook Secret` is used to sign ERPNext-to-Tarabut webhook messages, so Tarabut can verify that the message came from the configured ERPNext site.
+After installation, search ERPNext Desk for **Tarabut Integration**. The workspace provides:
 
-The app uses Tarabut production endpoints by default. Advanced URL settings are reserved for Tarabut support, staging, or private deployment scenarios.
+- **Tarabut Settings** for connection state and creation policies;
+- **Tarabut Mappings** for Item, Customer, and Supplier exceptions;
+- **Tarabut Sync History** for completed and failed inbound or outbound work.
 
-## What is created in ERPNext
+The Tarabut connection ID and webhook secret are installed automatically after successful authorization. They identify the ERPNext connection and sign ERPNext-to-Tarabut event notifications. They should not be copied between sites.
 
-The app creates these Tarabut records:
+The creation policies are:
 
-- `Tarabut Connector Settings`
-- `Tarabut Sync Record`
-- `Tarabut Entity Mapping`
+- **Allow Creating Missing Items** — permits a reviewed Tarabut item to be created when no mapped ERPNext Item exists. It is disabled by default.
+- **Allow Creating Customers and Suppliers** — permits a missing party to be created while exporting an order. It is disabled by default so parties require review or an explicit mapping.
+- **Default Item Group** and **Default UOM** — used only when creation of a missing Item is explicitly allowed.
 
-It also creates:
+Production Tarabut endpoints are preconfigured. Endpoint overrides are under the **Advanced** tab for staging or Tarabut-supported private deployments.
 
-- `Tarabut Integration User` role
-- Tarabut fields on `Sales Order`
-- Tarabut fields on `Purchase Order`
+## Catalogue and stock rules
 
-The Tarabut fields added to Sales Orders and Purchase Orders are:
+- The seller chooses one selling Price List and one explicit stock formula.
+- Every selected ERPNext Warehouse must map to a Tarabut stock location.
+- `actual_qty`, `projected_qty`, and calculated available quantity are different policies; Tarabut never changes between them silently.
+- Item/UOM is the sellable identity. Warehouse changes inventory placement, not product identity.
+- Disabled Items and changed mappings are presented for review rather than deleted automatically.
+- `Bin` is ERPNext's per-Item, per-Warehouse stock record. The integration reads its quantities to update the mapped Tarabut stock location.
 
-- `Tarabut Order Set ID`
-- `Tarabut Order ID`
-- `Tarabut Sync Status`
+## Order behavior
 
-These fields help ERPNext users trace a document back to its Tarabut order.
+- Seller orders become draft `Sales Order` documents.
+- Buyer order sets become one draft `Purchase Order` per seller child order.
+- Tarabut order and order-set IDs are stored on the ERPNext document.
+- A timeout after document creation is treated as an unknown result. Tarabut looks up the idempotency key before retrying.
+- ERPNext status is mirrored for visibility only; changing or cancelling an ERPNext order does not automatically change the Tarabut order.
 
-## Integration methods
+## Security
 
-Tarabut calls ERPNext through Frappe whitelisted methods.
-
-### Check an existing sync request
-
-```text
-tarabut_connector.api.order.find_document_by_idempotency_key
-```
-
-Use this to check whether a Tarabut request was already processed.
-
-### Create a Sales Order
-
-```text
-tarabut_connector.api.order.create_sales_order
-```
-
-Creates an ERPNext `Sales Order`.
-
-Required arguments:
-
-- `idempotency_key`
-- `company`
-- `payload`
-
-### Create a Purchase Order
-
-```text
-tarabut_connector.api.order.create_purchase_order
-```
-
-Creates an ERPNext `Purchase Order`.
-
-Required arguments:
-
-- `idempotency_key`
-- `company`
-- `payload`
-
-## Outbound webhook to Tarabut
-
-When the integration is enabled, the app listens for updates on:
-
-- `Sales Order`
-- `Purchase Order`
-- `Item`
-- `Item Price`
-- `Bin`
-
-When one of these ERPNext records changes, the app sends a webhook to Tarabut.
-
-Example payload:
-
-```json
-{
-  "connection_id": "your-connection-id",
-  "event_id": "uuid",
-  "doctype": "Sales Order",
-  "name": "SO-0001",
-  "modified_at": "2026-08-01 12:00:00.000000"
-}
-```
-
-Each webhook request includes:
-
-```text
-X-Tarabut-Signature: sha256=<signature>
-```
-
-Tarabut should verify this signature using the shared webhook secret.
-
-## How items, customers, and suppliers are matched
-
-For Items, the app checks the incoming Tarabut payload in this order:
-
-1. `metadata.erp_item_code`
-2. `variant_sku`
-3. `sku`
-4. `product_title`
-5. `title`
-
-For Customers, the app checks:
-
-1. Order email.
-2. Tarabut customer ID.
-3. Tarabut order ID.
-
-For Suppliers, the app checks:
-
-1. Seller name.
-2. Seller ID.
-
-Missing Items, Customers, and Suppliers are created only if the related setting allows it.
-
-## Current limitations
-
-The current version creates draft ERPNext orders only.
-
-It does not yet create:
-
-- Sales Invoices
-- Purchase Invoices
-- Payment Entries
-- Delivery Notes
-- Purchase Receipts
-- Stock Entries
-
-It also does not submit ERPNext documents automatically. ERPNext users should review and submit created documents according to their normal accounting and inventory workflow.
+- Use a dedicated restricted ERPNext integration user.
+- Expose ERPNext only over valid public HTTPS for direct mode.
+- Keep OAuth secrets, API secrets, and webhook secrets out of logs and support messages.
+- Tarabut event notifications are signed with HMAC and include a timestamp and unique event ID. Expired signatures are rejected, and duplicate event IDs are recorded without processing the event again.
+- Private or LAN-only ERPNext sites are not supported by direct mode; contact Tarabut before enabling a private-site transport.
 
 ## Support
 
-For Tarabut information, visit [tarabut.app](https://tarabut.app).
-
-For integration issues, open an issue in this repository:
-
-```text
-https://github.com/tarabut-app/tarabut-frappe-integration/issues
-```
+Visit [tarabut.app](https://tarabut.app) to learn about Tarabut. For connector problems, open an issue in the [Tarabut Frappe integration repository](https://github.com/tarabut-app/tarabut-frappe-integration/issues).
 
 ## License
 
-MIT.
+MIT
