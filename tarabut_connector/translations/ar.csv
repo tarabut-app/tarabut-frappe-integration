@@ -56,3 +56,9 @@ Webhook Secret is required when Tarabut Connector is enabled,المفتاح ال
 Tarabut Order Set ID,معرّف مجموعة طلب ترابط
 Tarabut Order ID,معرّف طلب ترابط
 Tarabut Sync Status,حالة مزامنة ترابط
+Filter By,تصفية حسب
+Save Filter,حفظ عامل التصفية
+Clear all filters,مسح جميع عوامل التصفية
+Generic Empty State,لا توجد بيانات
+ID,المعرّف
+Expand,توسيع
