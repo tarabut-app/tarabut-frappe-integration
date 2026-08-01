@@ -1,0 +1,114 @@
+{
+  "actions": [],
+  "allow_rename": 0,
+  "autoname": "hash",
+  "creation": "2026-08-01 00:00:00.000000",
+  "doctype": "DocType",
+  "engine": "InnoDB",
+  "field_order": [
+    "idempotency_key",
+    "direction",
+    "entity_type",
+    "tarabut_id",
+    "status",
+    "erp_section",
+    "erp_doctype",
+    "erp_name",
+    "payload",
+    "error"
+  ],
+  "fields": [
+    {
+      "fieldname": "idempotency_key",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "Idempotency Key",
+      "reqd": 1,
+      "unique": 1
+    },
+    {
+      "fieldname": "direction",
+      "fieldtype": "Select",
+      "in_list_view": 1,
+      "label": "Direction",
+      "options": "inbound\noutbound",
+      "reqd": 1
+    },
+    {
+      "fieldname": "entity_type",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "Entity Type",
+      "reqd": 1
+    },
+    {
+      "fieldname": "tarabut_id",
+      "fieldtype": "Data",
+      "label": "Tarabut ID"
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "in_list_view": 1,
+      "label": "Status",
+      "options": "Processing\nSucceeded\nFailed",
+      "reqd": 1
+    },
+    {
+      "fieldname": "erp_section",
+      "fieldtype": "Section Break",
+      "label": "ERP Document"
+    },
+    {
+      "fieldname": "erp_doctype",
+      "fieldtype": "Data",
+      "label": "ERP DocType"
+    },
+    {
+      "fieldname": "erp_name",
+      "fieldtype": "Dynamic Link",
+      "label": "ERP Name",
+      "options": "erp_doctype"
+    },
+    {
+      "fieldname": "payload",
+      "fieldtype": "Code",
+      "label": "Payload",
+      "options": "JSON"
+    },
+    {
+      "fieldname": "error",
+      "fieldtype": "Small Text",
+      "label": "Error"
+    }
+  ],
+  "links": [],
+  "modified": "2026-08-01 00:00:00.000000",
+  "module": "Tarabut",
+  "name": "Tarabut Sync Record",
+  "owner": "Administrator",
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 0,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    },
+    {
+      "create": 1,
+      "delete": 0,
+      "read": 1,
+      "role": "Tarabut Integration User",
+      "write": 1
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "states": []
+}

@@ -1,0 +1,108 @@
+{
+  "actions": [],
+  "allow_rename": 0,
+  "creation": "2026-08-01 00:00:00.000000",
+  "doctype": "DocType",
+  "engine": "InnoDB",
+  "field_order": [
+    "enabled",
+    "tarabut_base_url",
+    "tarabut_webhook_url",
+    "tarabut_connection_id",
+    "webhook_secret",
+    "defaults_section",
+    "default_item_group",
+    "default_uom",
+    "allow_create_items",
+    "allow_create_parties"
+  ],
+  "fields": [
+    {
+      "default": "0",
+      "fieldname": "enabled",
+      "fieldtype": "Check",
+      "label": "Enabled"
+    },
+    {
+      "fieldname": "tarabut_base_url",
+      "fieldtype": "Data",
+      "label": "Tarabut Base URL"
+    },
+    {
+      "fieldname": "tarabut_webhook_url",
+      "fieldtype": "Data",
+      "label": "Tarabut Webhook URL"
+    },
+    {
+      "fieldname": "tarabut_connection_id",
+      "fieldtype": "Data",
+      "label": "Tarabut Connection ID"
+    },
+    {
+      "fieldname": "webhook_secret",
+      "fieldtype": "Password",
+      "label": "Webhook Secret"
+    },
+    {
+      "fieldname": "defaults_section",
+      "fieldtype": "Section Break",
+      "label": "Defaults"
+    },
+    {
+      "default": "All Item Groups",
+      "fieldname": "default_item_group",
+      "fieldtype": "Link",
+      "label": "Default Item Group",
+      "options": "Item Group"
+    },
+    {
+      "default": "Nos",
+      "fieldname": "default_uom",
+      "fieldtype": "Link",
+      "label": "Default UOM",
+      "options": "UOM"
+    },
+    {
+      "default": "0",
+      "fieldname": "allow_create_items",
+      "fieldtype": "Check",
+      "label": "Allow Creating Missing Items"
+    },
+    {
+      "default": "1",
+      "fieldname": "allow_create_parties",
+      "fieldtype": "Check",
+      "label": "Allow Creating Customers and Suppliers"
+    }
+  ],
+  "issingle": 1,
+  "links": [],
+  "modified": "2026-08-01 00:00:00.000000",
+  "module": "Tarabut",
+  "name": "Tarabut Connector Settings",
+  "owner": "Administrator",
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 0,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    },
+    {
+      "create": 0,
+      "delete": 0,
+      "read": 1,
+      "role": "Tarabut Integration User",
+      "write": 0
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "states": []
+}
