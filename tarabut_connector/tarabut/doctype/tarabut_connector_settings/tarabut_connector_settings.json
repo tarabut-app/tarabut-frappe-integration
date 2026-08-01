@@ -62,18 +62,18 @@
       "label": "Defaults"
     },
     {
-      "default": "All Item Groups",
       "fieldname": "default_item_group",
       "fieldtype": "Link",
       "label": "Default Item Group",
-      "options": "Item Group"
+      "options": "Item Group",
+      "description": "Used only when Tarabut is allowed to create missing Items. Select this after ERPNext setup is complete."
     },
     {
-      "default": "Nos",
       "fieldname": "default_uom",
       "fieldtype": "Link",
       "label": "Default UOM",
-      "options": "UOM"
+      "options": "UOM",
+      "description": "Used only when Tarabut is allowed to create missing Items. Select this after ERPNext setup is complete."
     },
     {
       "default": "0",
