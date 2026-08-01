@@ -53,6 +53,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
+      - name: Install Bench system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes redis-server
       - name: Install Bench
         run: pip install frappe-bench
       - name: Create test Bench
