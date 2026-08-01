@@ -7,6 +7,12 @@ def after_install():
     create_tarabut_custom_fields()
 
 
+def after_migrate():
+    """Backfill idempotent integration metadata after app upgrades."""
+    create_roles()
+    create_tarabut_custom_fields()
+
+
 def create_roles():
     if not frappe.db.exists("Role", "Tarabut Integration User"):
         role = frappe.new_doc("Role")

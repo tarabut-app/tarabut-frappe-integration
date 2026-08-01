@@ -7,6 +7,7 @@ app_license = "MIT"
 app_logo_url = "/assets/tarabut_connector/images/tarabut-icon.png"
 
 after_install = "tarabut_connector.install.after_install"
+after_migrate = "tarabut_connector.install.after_migrate"
 
 doc_events = {
     "Sales Order": {

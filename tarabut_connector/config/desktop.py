@@ -5,6 +5,6 @@ def get_data():
             "type": "module",
             "label": "Tarabut / ترابط",
             "color": "blue",
-            "icon": "/assets/tarabut_connector/images/tarabut-icon.svg",
+            "icon": "/assets/tarabut_connector/images/tarabut-icon.png",
         }
     ]
