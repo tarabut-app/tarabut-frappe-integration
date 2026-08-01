@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 from frappe.model.document import Document
 
 
@@ -15,6 +16,6 @@ class TarabutConnectorSettings(Document):
 
     def validate(self):
         if self.enabled and not self.tarabut_connection_id:
-            frappe.throw("Tarabut Connection ID is required when Tarabut Connector is enabled")
+            frappe.throw(_("Tarabut Connection ID is required when Tarabut Connector is enabled"))
         if self.enabled and not self.get_password("webhook_secret"):
-            frappe.throw("Webhook Secret is required when Tarabut Connector is enabled")
+            frappe.throw(_("Webhook Secret is required when Tarabut Connector is enabled"))

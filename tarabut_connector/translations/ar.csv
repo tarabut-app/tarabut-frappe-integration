@@ -1,0 +1,58 @@
+Tarabut,ترابط
+Configuration,الإعدادات
+Connector Settings,إعدادات التكامل
+Operations,العمليات
+Sync Records,سجلات المزامنة
+Entity Mappings,ربط الكيانات
+Tarabut Connector Settings,إعدادات تكامل ترابط
+Tarabut Sync Record,سجل مزامنة ترابط
+Tarabut Entity Mapping,ربط كيانات ترابط
+Tarabut Integration User,مستخدم تكامل ترابط
+Connection,الاتصال
+Enabled,مفعّل
+Tarabut Base URL,عنوان ترابط الأساسي
+Tarabut Webhook URL,عنوان خطاف ترابط
+Tarabut Connection ID,معرّف اتصال ترابط
+Webhook Secret,المفتاح السري لخطاف الويب
+Defaults,القيم الافتراضية
+Default Item Group,مجموعة الأصناف الافتراضية
+Default UOM,وحدة القياس الافتراضية
+Allow Creating Missing Items,السماح بإنشاء الأصناف غير الموجودة
+Allow Creating Customers and Suppliers,السماح بإنشاء العملاء والموردين
+Advanced,متقدم
+Idempotency Key,مفتاح منع التكرار
+Direction,الاتجاه
+Entity Type,نوع الكيان
+Tarabut ID,معرّف ترابط
+Status,الحالة
+ERP Document,مستند نظام الموارد
+ERP DocType,نوع مستند النظام
+ERP Name,اسم مستند النظام
+Payload,بيانات الطلب
+Error,الخطأ
+External Key,المفتاح الخارجي
+Processing,قيد المعالجة
+Succeeded,ناجح
+Failed,فشل
+Active,نشط
+Disabled,معطّل
+inbound,وارد
+outbound,صادر
+item,صنف
+customer,عميل
+supplier,مورد
+sales_order,طلب بيع
+purchase_order,طلب شراء
+Tarabut payload must be an object,يجب أن تكون بيانات ترابط كائناً صالحاً
+Tarabut order has no items,لا يحتوي طلب ترابط على أصناف
+Tarabut item is missing an ERP item mapping,لا يحتوي صنف ترابط على ربط بصنف في نظام الموارد
+ERPNext Item does not exist: {0},صنف نظام الموارد غير موجود: {0}
+Tarabut order is missing customer identity,يفتقد طلب ترابط إلى هوية العميل
+ERPNext Customer does not exist: {0},عميل نظام الموارد غير موجود: {0}
+Tarabut seller is missing supplier identity,يفتقد بائع ترابط إلى هوية المورد
+ERPNext Supplier does not exist: {0},مورد نظام الموارد غير موجود: {0}
+Tarabut Connection ID is required when Tarabut Connector is enabled,معرّف اتصال ترابط مطلوب عند تفعيل تكامل ترابط
+Webhook Secret is required when Tarabut Connector is enabled,المفتاح السري لخطاف الويب مطلوب عند تفعيل تكامل ترابط
+Tarabut Order Set ID,معرّف مجموعة طلب ترابط
+Tarabut Order ID,معرّف طلب ترابط
+Tarabut Sync Status,حالة مزامنة ترابط

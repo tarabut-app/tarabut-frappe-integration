@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"tarabut_header\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Tarabut / ترابط</b></span>\",\"col\":12}},{\"id\":\"tarabut_settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Connector Settings\",\"col\":4}},{\"id\":\"tarabut_sync_records\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sync Records\",\"col\":4}},{\"id\":\"tarabut_entity_mappings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Entity Mappings\",\"col\":4}}]",
+ "content": "[{\"id\":\"tarabut_header\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Tarabut</b></span>\",\"col\":12}},{\"id\":\"tarabut_settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Connector Settings\",\"col\":4}},{\"id\":\"tarabut_sync_records\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sync Records\",\"col\":4}},{\"id\":\"tarabut_entity_mappings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Entity Mappings\",\"col\":4}}]",
  "creation": "2026-08-01 00:00:00.000000",
  "custom_blocks": [],
  "docstatus": 0,
@@ -94,5 +94,5 @@
    "type": "DocType"
   }
  ],
- "title": "Tarabut / ترابط"
+ "title": "Tarabut"
 }

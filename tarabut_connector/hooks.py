@@ -1,5 +1,5 @@
 app_name = "tarabut_connector"
-app_title = "Tarabut / ترابط"
+app_title = "Tarabut"
 app_publisher = "Tarabut"
 app_description = "Frappe and ERPNext integration for Tarabut marketplace sync"
 app_email = "dev@tarabut.app"

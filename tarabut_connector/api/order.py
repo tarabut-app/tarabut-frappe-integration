@@ -2,6 +2,7 @@ import json
 from typing import Any
 
 import frappe
+from frappe import _
 from frappe.utils import nowdate
 
 
@@ -83,7 +84,7 @@ def _coerce_payload(payload: Any) -> dict:
         return json.loads(payload)
     if isinstance(payload, dict):
         return payload
-    frappe.throw("Tarabut payload must be an object")
+    frappe.throw(_("Tarabut payload must be an object"))
 
 
 def _begin_sync(idempotency_key: str, direction: str, entity_type: str, payload: dict):
@@ -114,7 +115,7 @@ def _fail_sync(sync, exc: Exception):
 def _append_items(doc, order: dict, schedule_field: str):
     items = order.get("items") or []
     if not items:
-        frappe.throw("Tarabut order has no items")
+        frappe.throw(_("Tarabut order has no items"))
 
     for item in items:
         item_code = _resolve_item_code(item)
@@ -138,12 +139,12 @@ def _resolve_item_code(item: dict) -> str:
     ]
     item_code = next((value for value in candidates if value), None)
     if not item_code:
-        frappe.throw("Tarabut item is missing an ERP item mapping")
+        frappe.throw(_("Tarabut item is missing an ERP item mapping"))
 
     if not frappe.db.exists("Item", item_code):
         settings = _settings()
         if not settings.allow_create_items:
-            frappe.throw(f"ERPNext Item does not exist: {item_code}")
+            frappe.throw(_("ERPNext Item does not exist: {0}").format(item_code))
         doc = frappe.new_doc("Item")
         doc.item_code = item_code
         doc.item_name = item.get("product_title") or item.get("title") or item_code
@@ -166,12 +167,12 @@ def _resolve_customer(order: dict) -> str:
     email = order.get("email")
     customer_name = email or order.get("customer_id") or order.get("id")
     if not customer_name:
-        frappe.throw("Tarabut order is missing customer identity")
+        frappe.throw(_("Tarabut order is missing customer identity"))
 
     if not frappe.db.exists("Customer", customer_name):
         settings = _settings()
         if not settings.allow_create_parties:
-            frappe.throw(f"ERPNext Customer does not exist: {customer_name}")
+            frappe.throw(_("ERPNext Customer does not exist: {0}").format(customer_name))
         doc = frappe.new_doc("Customer")
         doc.customer_name = customer_name
         doc.customer_type = "Company"
@@ -182,12 +183,12 @@ def _resolve_customer(order: dict) -> str:
 def _resolve_supplier(seller: dict) -> str:
     supplier_name = seller.get("name") or seller.get("id")
     if not supplier_name:
-        frappe.throw("Tarabut seller is missing supplier identity")
+        frappe.throw(_("Tarabut seller is missing supplier identity"))
 
     if not frappe.db.exists("Supplier", supplier_name):
         settings = _settings()
         if not settings.allow_create_parties:
-            frappe.throw(f"ERPNext Supplier does not exist: {supplier_name}")
+            frappe.throw(_("ERPNext Supplier does not exist: {0}").format(supplier_name))
         doc = frappe.new_doc("Supplier")
         doc.supplier_name = supplier_name
         doc.supplier_type = "Company"
