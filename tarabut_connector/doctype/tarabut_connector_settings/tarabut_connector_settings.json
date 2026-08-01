@@ -5,18 +5,25 @@
   "doctype": "DocType",
   "engine": "InnoDB",
   "field_order": [
+    "connection_section",
     "enabled",
-    "tarabut_base_url",
-    "tarabut_webhook_url",
     "tarabut_connection_id",
     "webhook_secret",
     "defaults_section",
     "default_item_group",
     "default_uom",
     "allow_create_items",
-    "allow_create_parties"
+    "allow_create_parties",
+    "advanced_tab",
+    "tarabut_base_url",
+    "tarabut_webhook_url"
   ],
   "fields": [
+    {
+      "fieldname": "connection_section",
+      "fieldtype": "Section Break",
+      "label": "Connection"
+    },
     {
       "default": "0",
       "fieldname": "enabled",
@@ -24,11 +31,13 @@
       "label": "Enabled"
     },
     {
+      "default": "https://api.tarabut.app",
       "fieldname": "tarabut_base_url",
       "fieldtype": "Data",
       "label": "Tarabut Base URL"
     },
     {
+      "default": "https://api.tarabut.app/webhooks/erp/erpnext",
       "fieldname": "tarabut_webhook_url",
       "fieldtype": "Data",
       "label": "Tarabut Webhook URL"
@@ -73,6 +82,11 @@
       "fieldname": "allow_create_parties",
       "fieldtype": "Check",
       "label": "Allow Creating Customers and Suppliers"
+    },
+    {
+      "fieldname": "advanced_tab",
+      "fieldtype": "Tab Break",
+      "label": "Advanced"
     }
   ],
   "issingle": 1,

@@ -6,9 +6,12 @@ import uuid
 import frappe
 
 
+DEFAULT_TARABUT_WEBHOOK_URL = "https://api.tarabut.app/webhooks/erp/erpnext"
+
+
 def enqueue_document_change(doc, method=None):
     settings = frappe.get_single("Tarabut Connector Settings")
-    if not settings.enabled or not settings.tarabut_webhook_url:
+    if not settings.enabled:
         return
 
     frappe.enqueue(
@@ -22,8 +25,9 @@ def enqueue_document_change(doc, method=None):
 
 def send_document_change(doc_type: str, doc_name: str, modified_at: str):
     settings = frappe.get_single("Tarabut Connector Settings")
-    if not settings.enabled or not settings.tarabut_webhook_url:
+    if not settings.enabled:
         return
+    webhook_url = settings.tarabut_webhook_url or DEFAULT_TARABUT_WEBHOOK_URL
 
     payload = {
         "connection_id": settings.tarabut_connection_id,
@@ -40,7 +44,7 @@ def send_document_change(doc_type: str, doc_name: str, modified_at: str):
     ).hexdigest()
 
     frappe.make_post_request(
-        settings.tarabut_webhook_url,
+        webhook_url,
         data=raw_body,
         headers={
             "Content-Type": "application/json",
