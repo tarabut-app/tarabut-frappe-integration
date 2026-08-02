@@ -3,6 +3,7 @@ import hmac
 import json
 import time
 from unittest.mock import patch
+from urllib.parse import parse_qs, urlparse
 
 import frappe
 from frappe.tests.utils import FrappeTestCase
@@ -13,6 +14,12 @@ from tarabut_connector.api.order import (
     _purchase_order_row_defaults,
     _reserve_sync,
     _resolve_item_code,
+)
+from tarabut_connector.api.pairing import (
+    INTEGRATION_USER,
+    consume_pairing_session,
+    create_pairing_session,
+    inspect_pairing_session,
 )
 from tarabut_connector.api.webhook import _get_or_create_sync
 from tarabut_connector.install import after_install, before_uninstall
@@ -72,6 +79,50 @@ class TestConnectorContract(FrappeTestCase):
         settings.webhook_secret = "a-valid-webhook-secret"
         settings.before_validate()
         self.assertEqual(settings.enabled, 1)
+
+    def test_pairing_provisions_restricted_credentials_once(self):
+        company = "Test Company"
+        user = (
+            frappe.get_doc("User", INTEGRATION_USER)
+            if frappe.db.exists("User", INTEGRATION_USER)
+            else frappe.get_doc(
+                {
+                    "doctype": "User",
+                    "email": INTEGRATION_USER,
+                    "first_name": "Tarabut",
+                    "last_name": "Integration",
+                    "enabled": 1,
+                    "send_welcome_email": 0,
+                    "user_type": "System User",
+                }
+            )
+        )
+        user.set("roles", [{"role": "System Manager"}])
+        user.save(ignore_permissions=True)
+
+        with patch(
+            "tarabut_connector.api.pairing.frappe.get_all", return_value=[company]
+        ):
+            created = create_pairing_session()
+        parsed = urlparse(created["connect_url"])
+        pairing_code = parse_qs(parsed.query)["pairing_code"][0]
+        inspected = inspect_pairing_session(pairing_code)
+
+        self.assertEqual(parsed.hostname, "seller.tarabut.app")
+        self.assertIn(company, inspected["companies"])
+        self.assertNotIn("api_secret", inspected)
+
+        credentials = consume_pairing_session(pairing_code, company)
+        self.assertEqual(credentials["company"], company)
+        self.assertGreaterEqual(len(credentials["api_key"]), 32)
+        self.assertGreaterEqual(len(credentials["api_secret"]), 32)
+
+        user = frappe.get_doc("User", INTEGRATION_USER)
+        roles = {row.role for row in user.roles}
+        self.assertEqual(roles, {"Tarabut Integration User"})
+        self.assertIsNone(user.role_profile_name)
+        with self.assertRaises(frappe.ValidationError):
+            consume_pairing_session(pairing_code, company)
 
     def test_payload_accepts_json_and_dict(self):
         value = {"order": {"id": "order_test"}}

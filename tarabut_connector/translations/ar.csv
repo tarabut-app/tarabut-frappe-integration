@@ -13,8 +13,11 @@ Connected,متصل
 Connect with Tarabut,الربط مع ترابط
 Connection status is managed automatically by Tarabut.,تتم إدارة حالة الاتصال تلقائياً بواسطة ترابط.
 This ERPNext site is connected to Tarabut.,موقع ERPNext هذا متصل بترابط.
-Connect this ERPNext site from Tarabut's seller panel.,اربط موقع ERPNext هذا من لوحة البائع في ترابط.
-Save a valid Tarabut Base URL before connecting.,احفظ عنوان ترابط أساسي صالحاً قبل الربط.
+Click Connect with Tarabut to authorize this ERPNext site.,اضغط «الربط مع ترابط» لتفويض موقع ERPNext هذا.
+Preparing a secure Tarabut connection...,جارٍ إعداد اتصال آمن مع ترابط...
+Unable to connect with Tarabut,تعذر الربط مع ترابط
+Tarabut did not return a connection link.,لم تُرجع ترابط رابط اتصال.
+Check the advanced Tarabut URL and try again.,تحقق من عنوان ترابط في الإعدادات المتقدمة وحاول مرة أخرى.
 Tarabut Base URL,عنوان ترابط الأساسي
 Tarabut Webhook URL,عنوان خطاف ترابط
 Tarabut Connection ID,معرّف اتصال ترابط
