@@ -83,6 +83,10 @@ def _cache_key(pairing_code: str):
 
 
 def _public_site_url(request=None):
+    configured_url = _configured_public_site_url()
+    if configured_url:
+        return configured_url
+
     if request is None:
         request = getattr(frappe.local, "request", None)
     if request:
@@ -99,6 +103,18 @@ def _public_site_url(request=None):
             return f"{scheme}://{host}".rstrip("/")
 
     return get_url().rstrip("/")
+
+
+def _configured_public_site_url():
+    configured_url = (frappe.conf.get("tarabut_public_site_url") or "").strip()
+    if not configured_url:
+        return ""
+    parsed = urlparse(configured_url)
+    if parsed.scheme not in {"http", "https"} or not _is_safe_public_host(
+        parsed.netloc
+    ):
+        frappe.throw(_("Tarabut public site URL is invalid"))
+    return urlunparse((parsed.scheme, parsed.netloc, "", "", "", "")).rstrip("/")
 
 
 def _first_header_value(value):

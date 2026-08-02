@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.2 - 2026-08-02
+
+- Prefer an explicit `tarabut_public_site_url` site config value for pairing links when ERPNext runs behind an origin-only tunnel host.
+
 ## 0.3.1 - 2026-08-02
 
 - Use the public forwarded ERPNext host when creating one-click pairing links behind tunnels or reverse proxies.
