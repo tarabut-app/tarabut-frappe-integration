@@ -23,7 +23,10 @@ frappe.ui.form.on("Tarabut Connector Settings", {
         if (!connectUrl) {
           throw new Error(__("Tarabut did not return a connection link."))
         }
-        window.location.assign(connectUrl)
+        const popup = window.open(connectUrl, "_blank", "noopener,noreferrer")
+        if (!popup) {
+          window.location.assign(connectUrl)
+        }
       } catch (error) {
         frappe.msgprint({
           title: __("Unable to connect with Tarabut"),

@@ -1,3 +1,6 @@
+import importlib
+from importlib import metadata
+
 import frappe
 from frappe.utils.caching import redis_cache
 
@@ -23,14 +26,11 @@ SUPPORTED_DOCTYPES = (
 def get_capabilities():
     """Return the connector and ERP versions used during capability negotiation."""
     require_integration_user()
-    versions = frappe.get_versions()
     return {
         "connector": "tarabut_connector",
-        "connector_version": versions.get("tarabut_connector", {}).get(
-            "version", "unknown"
-        ),
-        "frappe_version": versions.get("frappe", {}).get("version", "unknown"),
-        "erpnext_version": versions.get("erpnext", {}).get("version", "unknown"),
+        "connector_version": _app_version("tarabut_connector"),
+        "frappe_version": _app_version("frappe"),
+        "erpnext_version": _app_version("erpnext"),
         "schema_version": "1",
         "roles": ["seller", "buyer"],
         "transports": ["direct"],
@@ -44,6 +44,29 @@ def get_capabilities():
             "create_items": True,
         },
     }
+
+
+def _app_version(app_name: str):
+    for package_name in (app_name, app_name.replace("_", "-")):
+        try:
+            return metadata.version(package_name)
+        except metadata.PackageNotFoundError:
+            pass
+
+    try:
+        app = importlib.import_module(app_name)
+        version = getattr(app, "__version__", None)
+        if version:
+            return version
+    except ImportError:
+        pass
+
+    versions = getattr(frappe, "get_versions", dict)()
+    if isinstance(versions, dict):
+        app = versions.get(app_name, {})
+        if isinstance(app, dict):
+            return app.get("version") or "unknown"
+    return "unknown"
 
 
 @frappe.whitelist()
