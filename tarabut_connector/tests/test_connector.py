@@ -140,6 +140,24 @@ class TestConnectorContract(FrappeTestCase):
             "https://test.mahsoob.nepro.tech",
         )
 
+    def test_pairing_site_url_prefers_explicit_site_config(self):
+        frappe.conf.tarabut_public_site_url = "https://test.mahsoob.nepro.tech/"
+        request = SimpleNamespace(
+            headers={
+                "X-Forwarded-Host": "mahsoob-origin.nepro.tech",
+                "X-Forwarded-Proto": "https",
+            },
+            host="mahsoob-origin.nepro.tech",
+            scheme="https",
+        )
+        try:
+            self.assertEqual(
+                _public_site_url(request),
+                "https://test.mahsoob.nepro.tech",
+            )
+        finally:
+            frappe.conf.pop("tarabut_public_site_url", None)
+
     def test_payload_accepts_json_and_dict(self):
         value = {"order": {"id": "order_test"}}
         self.assertEqual(_coerce_payload(value), value)
