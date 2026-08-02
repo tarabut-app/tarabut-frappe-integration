@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0 - 2026-08-02
+
+- Add a one-click connection flow initiated by a System Manager from ERPNext.
+- Use an expiring, single-use pairing code to associate the ERPNext site with an authenticated Tarabut seller.
+- Provision and rotate a dedicated restricted integration user's API credentials automatically without exposing them in the browser URL.
+- Move endpoint overrides and the hidden webhook secret into the Advanced tab.
+- Keep OAuth and manually generated API credentials as recovery options in Tarabut.
+
 ## 0.2.1 - 2026-08-02
 
 - Present connection state as system-managed status and direct disconnected users to Tarabut's seller panel.

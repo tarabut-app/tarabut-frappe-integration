@@ -9,7 +9,6 @@
     "enabled",
     "connect_with_tarabut",
     "tarabut_connection_id",
-    "webhook_secret",
     "defaults_section",
     "default_item_group",
     "default_uom",
@@ -17,7 +16,8 @@
     "allow_create_parties",
     "advanced_tab",
     "tarabut_base_url",
-    "tarabut_webhook_url"
+    "tarabut_webhook_url",
+    "webhook_secret"
   ],
   "fields": [
     {

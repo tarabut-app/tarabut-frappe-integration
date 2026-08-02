@@ -47,27 +47,19 @@ The `apps/tarabut_connector` destination is required because the public reposito
 
 ## Connect ERPNext to Tarabut
 
-### Recommended: OAuth 2
+### Recommended: one-click connection
 
-1. In ERPNext, create a dedicated user and assign the **Tarabut Integration User** role.
-2. Open **OAuth Client** in ERPNext and create a client for that user.
-3. Set its redirect URI to:
+1. In ERPNext, search for and open **Tarabut Connector Settings** as a System Manager.
+2. Click **Connect with Tarabut**.
+3. Sign in to the Tarabut seller panel if needed, select the ERPNext Company, and approve the connection.
+4. Select the selling Price List, stock formula, ERPNext Warehouses, and the corresponding Tarabut stock location for every selected Warehouse.
+5. Save the settings and run the first full catalogue sync. Review the proposed changes before committing them.
 
-   ```text
-   https://api.tarabut.app/vendor/erp/oauth/callback
-   ```
+The button creates an expiring, single-use pairing code. After approval, the app provisions a dedicated ERPNext user with only the **Tarabut Integration User** role and sends its newly generated API credentials directly to Tarabut. The credentials are never included in the browser URL. Tarabut stores them encrypted and installs the webhook signing secret automatically.
 
-4. In the Tarabut seller panel, open **Settings → ERPNext integration**.
-5. Enter the public HTTPS address of the ERPNext site, the ERPNext Company, OAuth client ID, and OAuth client secret. Tarabut generates and installs the webhook signing secret automatically.
-6. Continue to ERPNext, approve access, then return to Tarabut.
-7. Select the selling Price List, stock formula, ERPNext Warehouses, and the corresponding Tarabut stock location for every selected Warehouse.
-8. Save the settings and run the first full catalogue sync. Review the proposed changes before committing them.
+### Advanced manual connection
 
-Tarabut stores access and refresh tokens encrypted and refreshes an expired access token automatically. The dedicated integration user should not be given unrelated ERPNext roles.
-
-### API key compatibility mode
-
-If OAuth cannot be used on the ERPNext site, create API credentials for a dedicated user with the **Tarabut Integration User** role and choose **API key and secret** on the integration page.
+If one-click pairing cannot be used, open **Advanced manual setup** on the Tarabut integration page. You can enter API credentials for a dedicated user with the **Tarabut Integration User** role, or use an ERPNext OAuth Client with the production redirect URI `https://api.tarabut.app/vendor/erp/oauth/callback`.
 
 ## ERPNext settings and workspace
 

@@ -3,6 +3,7 @@ import hmac
 import json
 import time
 from unittest.mock import patch
+from urllib.parse import parse_qs, urlparse
 
 import frappe
 from frappe.tests.utils import FrappeTestCase
@@ -13,6 +14,12 @@ from tarabut_connector.api.order import (
     _purchase_order_row_defaults,
     _reserve_sync,
     _resolve_item_code,
+)
+from tarabut_connector.api.pairing import (
+    INTEGRATION_USER,
+    consume_pairing_session,
+    create_pairing_session,
+    inspect_pairing_session,
 )
 from tarabut_connector.api.webhook import _get_or_create_sync
 from tarabut_connector.install import after_install, before_uninstall
@@ -72,6 +79,31 @@ class TestConnectorContract(FrappeTestCase):
         settings.webhook_secret = "a-valid-webhook-secret"
         settings.before_validate()
         self.assertEqual(settings.enabled, 1)
+
+    def test_pairing_provisions_restricted_credentials_once(self):
+        companies = frappe.get_all("Company", pluck="name")
+        self.assertTrue(companies)
+
+        created = create_pairing_session()
+        parsed = urlparse(created["connect_url"])
+        pairing_code = parse_qs(parsed.query)["pairing_code"][0]
+        inspected = inspect_pairing_session(pairing_code)
+
+        self.assertEqual(parsed.hostname, "seller.tarabut.app")
+        self.assertIn(companies[0], inspected["companies"])
+        self.assertNotIn("api_secret", inspected)
+
+        credentials = consume_pairing_session(pairing_code, companies[0])
+        self.assertEqual(credentials["company"], companies[0])
+        self.assertGreaterEqual(len(credentials["api_key"]), 32)
+        self.assertGreaterEqual(len(credentials["api_secret"]), 32)
+
+        user = frappe.get_doc("User", INTEGRATION_USER)
+        roles = {row.role for row in user.roles}
+        self.assertIn("Tarabut Integration User", roles)
+        self.assertNotIn("System Manager", roles)
+        with self.assertRaises(frappe.ValidationError):
+            consume_pairing_session(pairing_code, companies[0])
 
     def test_payload_accepts_json_and_dict(self):
         value = {"order": {"id": "order_test"}}
