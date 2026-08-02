@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.3 - 2026-08-02
+
+- Use Frappe's compatible per-app version lookup in capability negotiation.
+- Open Tarabut authorization in a new tab from ERPNext, preserving the settings page.
+
 ## 0.3.2 - 2026-08-02
 
 - Prefer an explicit `tarabut_public_site_url` site config value for pairing links when ERPNext runs behind an origin-only tunnel host.

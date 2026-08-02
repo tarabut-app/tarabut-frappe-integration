@@ -23,6 +23,7 @@ from tarabut_connector.api.pairing import (
     create_pairing_session,
     inspect_pairing_session,
 )
+from tarabut_connector.api.system import _app_version
 from tarabut_connector.api.webhook import _get_or_create_sync
 from tarabut_connector.install import after_install, before_uninstall
 from tarabut_connector.tarabut.doctype.tarabut_connector_settings.tarabut_connector_settings import (
@@ -157,6 +158,11 @@ class TestConnectorContract(FrappeTestCase):
             )
         finally:
             frappe.conf.pop("tarabut_public_site_url", None)
+
+    def test_app_version_uses_compatible_frappe_lookup(self):
+        with patch("tarabut_connector.api.system.metadata.version") as get_version:
+            get_version.return_value = "15.1.0"
+            self.assertEqual(_app_version("frappe"), "15.1.0")
 
     def test_payload_accepts_json_and_dict(self):
         value = {"order": {"id": "order_test"}}
