@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1 - 2026-08-02
+
+- Present connection state as system-managed status and direct disconnected users to Tarabut's seller panel.
+- Keep platform-installed credentials hidden while showing the assigned connection ID after authorization.
+- Allow disconnected sites to save advanced Tarabut API and webhook URL overrides.
+- Hide creation defaults until the integration is connected.
+
 ## 0.2.0 - 2026-08-01
 
 - Add ERPNext 15 and 16 compatibility checks and CI coverage.
