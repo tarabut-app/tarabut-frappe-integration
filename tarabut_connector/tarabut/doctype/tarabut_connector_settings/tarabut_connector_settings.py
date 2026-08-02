@@ -18,7 +18,11 @@ class TarabutConnectorSettings(Document):
 
     def _synchronize_connection_status(self):
         connection_id = (self.tarabut_connection_id or "").strip()
-        webhook_secret = self.get_password("webhook_secret") or ""
+        # A new Single DocType has no encrypted password row yet. Treat that as
+        # disconnected so the app can be installed before Tarabut authorization.
+        webhook_secret = (
+            self.get_password("webhook_secret", raise_exception=False) or ""
+        )
         if connection_id and webhook_secret:
             self.enabled = 1
             return
