@@ -83,6 +83,23 @@ class TestConnectorContract(FrappeTestCase):
     def test_pairing_provisions_restricted_credentials_once(self):
         companies = frappe.get_all("Company", pluck="name")
         self.assertTrue(companies)
+        user = (
+            frappe.get_doc("User", INTEGRATION_USER)
+            if frappe.db.exists("User", INTEGRATION_USER)
+            else frappe.get_doc(
+                {
+                    "doctype": "User",
+                    "email": INTEGRATION_USER,
+                    "first_name": "Tarabut",
+                    "last_name": "Integration",
+                    "enabled": 1,
+                    "send_welcome_email": 0,
+                    "user_type": "System User",
+                }
+            )
+        )
+        user.set("roles", [{"role": "System Manager"}])
+        user.save(ignore_permissions=True)
 
         created = create_pairing_session()
         parsed = urlparse(created["connect_url"])
@@ -100,8 +117,8 @@ class TestConnectorContract(FrappeTestCase):
 
         user = frappe.get_doc("User", INTEGRATION_USER)
         roles = {row.role for row in user.roles}
-        self.assertIn("Tarabut Integration User", roles)
-        self.assertNotIn("System Manager", roles)
+        self.assertEqual(roles, {"Tarabut Integration User"})
+        self.assertIsNone(user.role_profile_name)
         with self.assertRaises(frappe.ValidationError):
             consume_pairing_session(pairing_code, companies[0])
 

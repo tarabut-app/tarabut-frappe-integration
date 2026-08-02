@@ -114,8 +114,9 @@ def _provision_integration_user():
 
     user.enabled = 1
     user.user_type = "System User"
-    if not any(row.role == "Tarabut Integration User" for row in user.roles):
-        user.append("roles", {"role": "Tarabut Integration User"})
+    user.role_profile_name = None
+    user.set("roles", [])
+    user.append("roles", {"role": "Tarabut Integration User"})
     if not user.api_key:
         user.api_key = frappe.generate_hash(length=32)
     api_secret = frappe.generate_hash(length=32)
