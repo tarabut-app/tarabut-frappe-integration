@@ -81,8 +81,7 @@ class TestConnectorContract(FrappeTestCase):
         self.assertEqual(settings.enabled, 1)
 
     def test_pairing_provisions_restricted_credentials_once(self):
-        companies = frappe.get_all("Company", pluck="name")
-        self.assertTrue(companies)
+        company = "Test Company"
         user = (
             frappe.get_doc("User", INTEGRATION_USER)
             if frappe.db.exists("User", INTEGRATION_USER)
@@ -101,17 +100,20 @@ class TestConnectorContract(FrappeTestCase):
         user.set("roles", [{"role": "System Manager"}])
         user.save(ignore_permissions=True)
 
-        created = create_pairing_session()
+        with patch(
+            "tarabut_connector.api.pairing.frappe.get_all", return_value=[company]
+        ):
+            created = create_pairing_session()
         parsed = urlparse(created["connect_url"])
         pairing_code = parse_qs(parsed.query)["pairing_code"][0]
         inspected = inspect_pairing_session(pairing_code)
 
         self.assertEqual(parsed.hostname, "seller.tarabut.app")
-        self.assertIn(companies[0], inspected["companies"])
+        self.assertIn(company, inspected["companies"])
         self.assertNotIn("api_secret", inspected)
 
-        credentials = consume_pairing_session(pairing_code, companies[0])
-        self.assertEqual(credentials["company"], companies[0])
+        credentials = consume_pairing_session(pairing_code, company)
+        self.assertEqual(credentials["company"], company)
         self.assertGreaterEqual(len(credentials["api_key"]), 32)
         self.assertGreaterEqual(len(credentials["api_secret"]), 32)
 
@@ -120,7 +122,7 @@ class TestConnectorContract(FrappeTestCase):
         self.assertEqual(roles, {"Tarabut Integration User"})
         self.assertIsNone(user.role_profile_name)
         with self.assertRaises(frappe.ValidationError):
-            consume_pairing_session(pairing_code, companies[0])
+            consume_pairing_session(pairing_code, company)
 
     def test_payload_accepts_json_and_dict(self):
         value = {"order": {"id": "order_test"}}
