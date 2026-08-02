@@ -2,6 +2,7 @@ import hashlib
 import hmac
 import json
 import time
+from types import SimpleNamespace
 from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
@@ -17,6 +18,7 @@ from tarabut_connector.api.order import (
 )
 from tarabut_connector.api.pairing import (
     INTEGRATION_USER,
+    _public_site_url,
     consume_pairing_session,
     create_pairing_session,
     inspect_pairing_session,
@@ -123,6 +125,20 @@ class TestConnectorContract(FrappeTestCase):
         self.assertIsNone(user.role_profile_name)
         with self.assertRaises(frappe.ValidationError):
             consume_pairing_session(pairing_code, company)
+
+    def test_pairing_site_url_prefers_forwarded_public_host(self):
+        request = SimpleNamespace(
+            headers={
+                "X-Forwarded-Host": "test.mahsoob.nepro.tech",
+                "X-Forwarded-Proto": "https",
+            },
+            host="mahsoob-origin.nepro.tech",
+            scheme="http",
+        )
+        self.assertEqual(
+            _public_site_url(request),
+            "https://test.mahsoob.nepro.tech",
+        )
 
     def test_payload_accepts_json_and_dict(self):
         value = {"order": {"id": "order_test"}}

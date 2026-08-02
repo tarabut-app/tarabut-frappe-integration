@@ -18,7 +18,7 @@ def create_pairing_session():
     settings = frappe.get_single("Tarabut Connector Settings")
     settings.validate()
     pairing_code = secrets.token_urlsafe(32)
-    site_url = get_url().rstrip("/")
+    site_url = _public_site_url()
     companies = frappe.get_all(
         "Company", filters={"is_group": 0}, pluck="name", order_by="name asc"
     )
@@ -80,6 +80,37 @@ def _get_session(pairing_code: str):
 def _cache_key(pairing_code: str):
     digest = hashlib.sha256((pairing_code or "").encode()).hexdigest()
     return f"tarabut-pairing:{digest}"
+
+
+def _public_site_url(request=None):
+    if request is None:
+        request = getattr(frappe.local, "request", None)
+    if request:
+        headers = getattr(request, "headers", {}) or {}
+        host = _first_header_value(headers.get("X-Forwarded-Host")) or getattr(
+            request, "host", ""
+        )
+        scheme = _first_header_value(headers.get("X-Forwarded-Proto")) or getattr(
+            request, "scheme", ""
+        )
+        if _is_safe_public_host(host):
+            if scheme not in {"http", "https"}:
+                scheme = "https"
+            return f"{scheme}://{host}".rstrip("/")
+
+    return get_url().rstrip("/")
+
+
+def _first_header_value(value):
+    if not value:
+        return ""
+    return str(value).split(",", 1)[0].strip()
+
+
+def _is_safe_public_host(host):
+    if not host:
+        return False
+    return not any(character.isspace() or character in "/\\@" for character in host)
 
 
 def _connect_url(base_url: str, site_url: str, pairing_code: str):

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 - 2026-08-02
+
+- Use the public forwarded ERPNext host when creating one-click pairing links behind tunnels or reverse proxies.
+
 ## 0.3.0 - 2026-08-02
 
 - Add a one-click connection flow initiated by a System Manager from ERPNext.
