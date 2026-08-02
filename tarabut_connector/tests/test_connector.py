@@ -53,6 +53,26 @@ class TestConnectorContract(FrappeTestCase):
         self.assertEqual(settings.tarabut_base_url, DEFAULT_TARABUT_BASE_URL)
         self.assertEqual(settings.tarabut_webhook_url, DEFAULT_TARABUT_WEBHOOK_URL)
 
+    def test_disconnected_settings_can_save_advanced_urls(self):
+        settings = frappe.get_single("Tarabut Connector Settings")
+        settings.enabled = 1
+        settings.tarabut_connection_id = None
+        settings.webhook_secret = None
+        settings.tarabut_base_url = "https://api.stage.tarabut.app"
+        settings.tarabut_webhook_url = (
+            "https://api.stage.tarabut.app/webhooks/erp/erpnext"
+        )
+        settings.save(ignore_permissions=True)
+        self.assertEqual(settings.enabled, 0)
+        self.assertEqual(settings.tarabut_base_url, "https://api.stage.tarabut.app")
+
+    def test_complete_credentials_set_connected_status(self):
+        settings = frappe.get_single("Tarabut Connector Settings")
+        settings.tarabut_connection_id = "erpconn_test"
+        settings.webhook_secret = "a-valid-webhook-secret"
+        settings.before_validate()
+        self.assertEqual(settings.enabled, 1)
+
     def test_payload_accepts_json_and_dict(self):
         value = {"order": {"id": "order_test"}}
         self.assertEqual(_coerce_payload(value), value)

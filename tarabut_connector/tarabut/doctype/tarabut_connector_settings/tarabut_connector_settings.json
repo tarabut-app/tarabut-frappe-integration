@@ -7,6 +7,7 @@
   "field_order": [
     "connection_section",
     "enabled",
+    "connect_with_tarabut",
     "tarabut_connection_id",
     "webhook_secret",
     "defaults_section",
@@ -28,7 +29,15 @@
       "default": "0",
       "fieldname": "enabled",
       "fieldtype": "Check",
-      "label": "Enabled"
+      "label": "Connected",
+      "read_only": 1,
+      "description": "Connection status is managed automatically by Tarabut."
+    },
+    {
+      "depends_on": "eval:!doc.enabled",
+      "fieldname": "connect_with_tarabut",
+      "fieldtype": "Button",
+      "label": "Connect with Tarabut"
     },
     {
       "default": "https://api.tarabut.app",
@@ -47,6 +56,7 @@
       "fieldtype": "Data",
       "label": "Tarabut Connection ID",
       "read_only": 1,
+      "depends_on": "eval:doc.enabled",
       "description": "Assigned automatically when this ERPNext site is authorized in Tarabut."
     },
     {
@@ -54,12 +64,14 @@
       "fieldtype": "Password",
       "label": "Webhook Secret",
       "read_only": 1,
+      "hidden": 1,
       "description": "Installed automatically and used to sign ERPNext event notifications."
     },
     {
       "fieldname": "defaults_section",
       "fieldtype": "Section Break",
-      "label": "Defaults"
+      "label": "Defaults",
+      "depends_on": "eval:doc.enabled"
     },
     {
       "fieldname": "default_item_group",

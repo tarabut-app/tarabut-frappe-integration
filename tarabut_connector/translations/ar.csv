@@ -9,11 +9,17 @@ Tarabut Sync Record,سجل مزامنة ترابط
 Tarabut Entity Mapping,ربط كيانات ترابط
 Tarabut Integration User,مستخدم تكامل ترابط
 Connection,الاتصال
-Enabled,مفعّل
+Connected,متصل
+Connect with Tarabut,الربط مع ترابط
+Connection status is managed automatically by Tarabut.,تتم إدارة حالة الاتصال تلقائياً بواسطة ترابط.
+This ERPNext site is connected to Tarabut.,موقع ERPNext هذا متصل بترابط.
+Connect this ERPNext site from Tarabut's seller panel.,اربط موقع ERPNext هذا من لوحة البائع في ترابط.
+Save a valid Tarabut Base URL before connecting.,احفظ عنوان ترابط أساسي صالحاً قبل الربط.
 Tarabut Base URL,عنوان ترابط الأساسي
 Tarabut Webhook URL,عنوان خطاف ترابط
 Tarabut Connection ID,معرّف اتصال ترابط
 Webhook Secret,المفتاح السري لخطاف الويب
+Tarabut connection credentials are incomplete. Reconnect from Tarabut to repair the connection.,بيانات اعتماد اتصال ترابط غير مكتملة. أعد الربط من ترابط لإصلاح الاتصال.
 Defaults,القيم الافتراضية
 Default Item Group,مجموعة الأصناف الافتراضية
 Default UOM,وحدة القياس الافتراضية

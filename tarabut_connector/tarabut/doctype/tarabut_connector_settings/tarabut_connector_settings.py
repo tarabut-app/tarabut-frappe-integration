@@ -14,6 +14,22 @@ class TarabutConnectorSettings(Document):
             self.tarabut_base_url = DEFAULT_TARABUT_BASE_URL
         if not self.tarabut_webhook_url:
             self.tarabut_webhook_url = DEFAULT_TARABUT_WEBHOOK_URL
+        self._synchronize_connection_status()
+
+    def _synchronize_connection_status(self):
+        connection_id = (self.tarabut_connection_id or "").strip()
+        webhook_secret = self.get_password("webhook_secret") or ""
+        if connection_id and webhook_secret:
+            self.enabled = 1
+            return
+        if not connection_id and not webhook_secret:
+            self.enabled = 0
+            return
+        frappe.throw(
+            _(
+                "Tarabut connection credentials are incomplete. Reconnect from Tarabut to repair the connection."
+            )
+        )
 
     def validate(self):
         for label, value in (
@@ -23,11 +39,3 @@ class TarabutConnectorSettings(Document):
             parsed = urlparse(value or "")
             if parsed.scheme != "https" or not parsed.hostname or parsed.username:
                 frappe.throw(f"{label} must be a public HTTPS URL without credentials")
-        if self.enabled and not self.tarabut_connection_id:
-            frappe.throw(
-                _("Tarabut Connection ID is required when Tarabut Connector is enabled")
-            )
-        if self.enabled and not self.get_password("webhook_secret"):
-            frappe.throw(
-                _("Webhook Secret is required when Tarabut Connector is enabled")
-            )
