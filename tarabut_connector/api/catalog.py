@@ -62,15 +62,17 @@ def _build_product_snapshot(item_code, company, price_list, warehouses):
     if not frappe.db.exists("Item", item_code):
         frappe.throw(f"ERPNext Item does not exist: {item_code}")
     item = frappe.get_doc("Item", item_code)
+    image = frappe.utils.get_url(item.get("image")) if item.get("image") else None
     if item.variant_of:
         template_code = item.variant_of
     else:
         template_code = item.name
 
-    uoms = {item.stock_uom}
+    uom_rows = {item.stock_uom: 1.0}
     for row in item.get("uoms") or []:
         if row.uom:
-            uoms.add(row.uom)
+            conversion_factor = flt(row.get("conversion_factor") or 1)
+            uom_rows[row.uom] = conversion_factor if conversion_factor > 0 else 1.0
 
     prices = frappe.get_all(
         "Item Price",
@@ -98,6 +100,44 @@ def _build_product_snapshot(item_code, company, price_list, warehouses):
             ],
         )
 
+    prices_by_uom = {}
+    for row in prices:
+        uom = row.uom or item.stock_uom
+        if uom not in prices_by_uom:
+            prices_by_uom[uom] = {
+                "name": row.name,
+                "uom": uom,
+                "currency": row.currency,
+                "rate": flt(row.price_list_rate),
+                "modified": str(row.modified),
+            }
+
+    barcodes = [
+        {
+            "barcode": row.barcode,
+            "uom": row.get("uom") or item.stock_uom,
+        }
+        for row in (item.get("barcodes") or [])
+        if row.get("barcode")
+    ]
+    barcodes_by_uom = {row["uom"]: row["barcode"] for row in barcodes}
+
+    sellable_uoms = []
+    for uom, conversion_factor in sorted(uom_rows.items()):
+        price = prices_by_uom.get(uom)
+        sellable_uoms.append(
+            {
+                "uom": uom,
+                "conversion_factor": conversion_factor,
+                "is_stock_uom": uom == item.stock_uom,
+                "price": price,
+                "barcode": barcodes_by_uom.get(uom),
+                "image": image,
+                "disabled": bool(item.disabled),
+                "modified": str(item.modified),
+            }
+        )
+
     payload = {
         "external_key": f"{company}:{item.name}",
         "company": company,
@@ -105,19 +145,15 @@ def _build_product_snapshot(item_code, company, price_list, warehouses):
         "template_code": template_code,
         "item_name": item.item_name,
         "description": item.description,
+        "item_group": item.item_group,
+        "brand": item.get("brand"),
+        "image": image,
+        "barcodes": barcodes,
         "disabled": bool(item.disabled),
         "stock_uom": item.stock_uom,
-        "uoms": sorted(uoms),
-        "prices": [
-            {
-                "name": row.name,
-                "uom": row.uom or item.stock_uom,
-                "currency": row.currency,
-                "rate": flt(row.price_list_rate),
-                "modified": str(row.modified),
-            }
-            for row in prices
-        ],
+        "uoms": sorted(uom_rows),
+        "sellable_uoms": sellable_uoms,
+        "prices": list(prices_by_uom.values()),
         "bins": [
             {
                 "name": row.name,

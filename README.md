@@ -74,7 +74,7 @@ The Tarabut connection ID and webhook secret are installed automatically after s
 The creation policies are:
 
 - **Allow Creating Missing Items** — permits a reviewed Tarabut item to be created when no mapped ERPNext Item exists. It is disabled by default.
-- **Allow Creating Customers and Suppliers** — permits a missing party to be created while exporting an order. It is disabled by default so parties require review or an explicit mapping.
+- **Allow Creating Customers and Suppliers** — permits automatic missing-party creation outside the seller's explicit order-review action. It is disabled by default; a seller can still approve creating a specific Customer from the Tarabut order sync workspace.
 - **Default Item Group** and **Default UOM** — used only when creation of a missing Item is explicitly allowed.
 
 Production Tarabut endpoints are preconfigured. Endpoint overrides are under the **Advanced** tab for staging or Tarabut-supported private deployments.
@@ -85,6 +85,8 @@ Production Tarabut endpoints are preconfigured. Endpoint overrides are under the
 - Every selected ERPNext Warehouse must map to a Tarabut stock location.
 - `actual_qty`, `projected_qty`, and calculated available quantity are different policies; Tarabut never changes between them silently.
 - Item/UOM is the sellable identity. Warehouse changes inventory placement, not product identity.
+- Each Item/UOM becomes one Tarabut product with one default variant. Alternate UOMs are separate products, not variants of one product.
+- Products for the same ERPNext Item share one stock pool. Each UOM consumes the shared stock using its ERPNext conversion factor, so pack products do not duplicate inventory.
 - Disabled Items and changed mappings are presented for review rather than deleted automatically.
 - `Bin` is ERPNext's per-Item, per-Warehouse stock record. The integration reads its quantities to update the mapped Tarabut stock location.
 

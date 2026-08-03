@@ -7,6 +7,34 @@ from tarabut_connector.api.order import _coerce_payload, _settings
 
 
 @frappe.whitelist()
+def search_customers(
+    query: str | None = None, limit: int | str = 20, offset: int | str = 0
+):
+    """Return a bounded Customer picker for Tarabut order review."""
+    require_integration_user()
+    page_limit = min(max(int(limit or 20), 1), 100)
+    page_offset = max(int(offset or 0), 0)
+    filters = {}
+    if query:
+        filters["customer_name"] = ("like", f"%{query.strip()}%")
+    customers = frappe.get_all(
+        "Customer",
+        filters=filters,
+        fields=["name", "customer_name", "customer_type", "mobile_no"],
+        start=page_offset,
+        page_length=page_limit,
+        order_by="customer_name asc, name asc",
+    )
+    return {
+        "items": customers,
+        "count": len(customers),
+        "limit": page_limit,
+        "offset": page_offset,
+        "has_more": len(customers) == page_limit,
+    }
+
+
+@frappe.whitelist()
 def upsert_customer(tarabut_id: str, payload: Any):
     require_integration_user()
     data = _coerce_payload(payload)
@@ -48,7 +76,10 @@ def upsert_item(tarabut_id: str, payload: Any):
 
 def _upsert_party(doctype, entity_type, tarabut_id, data):
     settings = _settings()
-    if not settings.allow_create_parties:
+    reviewed_customer_creation = bool(
+        doctype == "Customer" and data.get("reviewed_creation")
+    )
+    if not settings.allow_create_parties and not reviewed_customer_creation:
         frappe.throw("Creating Customers and Suppliers through Tarabut is disabled")
     mapping = _mapping(entity_type, tarabut_id)
     party_name = mapping.erp_name if mapping else data.get("name")
@@ -56,7 +87,12 @@ def _upsert_party(doctype, entity_type, tarabut_id, data):
         doc = frappe.get_doc(doctype, party_name)
     else:
         doc = frappe.new_doc(doctype)
-        display_name = data.get("display_name") or data.get("name") or tarabut_id
+        display_name = (
+            data.get("customer_name")
+            or data.get("display_name")
+            or data.get("name")
+            or tarabut_id
+        )
         if doctype == "Customer":
             doc.customer_name = display_name
             doc.customer_type = data.get("customer_type") or "Company"

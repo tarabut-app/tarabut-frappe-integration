@@ -9,6 +9,7 @@ from urllib.parse import parse_qs, urlparse
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
+from tarabut_connector.api.catalog import _build_product_snapshot
 from tarabut_connector.api.order import (
     _coerce_payload,
     _complete_sync,
@@ -23,6 +24,7 @@ from tarabut_connector.api.pairing import (
     create_pairing_session,
     inspect_pairing_session,
 )
+from tarabut_connector.api.party import search_customers
 from tarabut_connector.api.system import _app_version
 from tarabut_connector.api.webhook import _get_or_create_sync
 from tarabut_connector.install import after_install, before_uninstall
@@ -163,6 +165,94 @@ class TestConnectorContract(FrappeTestCase):
         with patch("tarabut_connector.api.system.metadata.version") as get_version:
             get_version.return_value = "15.1.0"
             self.assertEqual(_app_version("frappe"), "15.1.0")
+
+    def test_catalogue_snapshot_exposes_sellable_uom_contract(self):
+        item = frappe._dict(
+            name="ITEM-1",
+            variant_of=None,
+            item_name="Test Item",
+            description="Description",
+            item_group="Products",
+            brand="Tarabut",
+            image="/files/item.png",
+            disabled=0,
+            stock_uom="Nos",
+            modified="2026-08-03 00:00:00",
+            uoms=[frappe._dict(uom="Box", conversion_factor=12)],
+            barcodes=[frappe._dict(barcode="123456789", uom="Nos")],
+        )
+        prices = [
+            frappe._dict(
+                name="PRICE-NOS",
+                uom="Nos",
+                currency="IQD",
+                price_list_rate=1000,
+                modified="2026-08-03 00:00:00",
+            ),
+            frappe._dict(
+                name="PRICE-BOX",
+                uom="Box",
+                currency="IQD",
+                price_list_rate=12000,
+                modified="2026-08-03 00:00:00",
+            ),
+        ]
+        with (
+            patch("tarabut_connector.api.catalog.frappe.db.exists", return_value=True),
+            patch("tarabut_connector.api.catalog.frappe.get_doc", return_value=item),
+            patch(
+                "tarabut_connector.api.catalog.frappe.get_all",
+                side_effect=[prices, []],
+            ),
+        ):
+            snapshot = _build_product_snapshot(
+                "ITEM-1", "Test Company", "Selling", ["Main - TC"]
+            )
+
+        self.assertEqual(snapshot["barcodes"], [{"barcode": "123456789", "uom": "Nos"}])
+        self.assertEqual(snapshot["item_group"], "Products")
+        self.assertEqual(
+            snapshot["sellable_uoms"],
+            [
+                {
+                    "uom": "Box",
+                    "conversion_factor": 12.0,
+                    "is_stock_uom": False,
+                    "price": snapshot["prices"][1],
+                    "barcode": None,
+                    "image": frappe.utils.get_url("/files/item.png"),
+                    "disabled": False,
+                    "modified": "2026-08-03 00:00:00",
+                },
+                {
+                    "uom": "Nos",
+                    "conversion_factor": 1.0,
+                    "is_stock_uom": True,
+                    "price": snapshot["prices"][0],
+                    "barcode": "123456789",
+                    "image": frappe.utils.get_url("/files/item.png"),
+                    "disabled": False,
+                    "modified": "2026-08-03 00:00:00",
+                },
+            ],
+        )
+
+    def test_customer_picker_is_bounded(self):
+        customers = [frappe._dict(name="CUST-1", customer_name="Customer One")]
+        with (
+            patch("tarabut_connector.api.party.require_integration_user"),
+            patch(
+                "tarabut_connector.api.party.frappe.get_all",
+                return_value=customers,
+            ) as get_all,
+        ):
+            result = search_customers("Customer", limit=500, offset=2)
+
+        self.assertEqual(result["items"], customers)
+        self.assertEqual(result["count"], 1)
+        self.assertEqual(result["limit"], 100)
+        self.assertFalse(result["has_more"])
+        self.assertEqual(get_all.call_args.kwargs["start"], 2)
 
     def test_payload_accepts_json_and_dict(self):
         value = {"order": {"id": "order_test"}}

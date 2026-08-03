@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 - 2026-08-04
+
+- Expand ERPNext Items into an explicit sellable-UOM catalogue contract with exact UOM prices, conversion factors, stock-UOM identity, barcodes, images, disabled state, and modification timestamps.
+- Return absolute Item image URLs and the selected stock quantities needed by Tarabut's review-first catalogue workspace.
+- Add paginated ERPNext Customer search for reviewed Sales Order export.
+- Allow a seller-approved Customer creation from the Tarabut order review while keeping automatic party creation disabled.
+- Advertise catalogue schema version 2 for the Item/UOM mapping model.
+
 ## 0.3.3 - 2026-08-02
 
 - Use Frappe's compatible per-app version lookup in capability negotiation.
