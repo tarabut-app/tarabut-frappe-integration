@@ -31,7 +31,7 @@ def get_capabilities():
         "connector_version": _app_version("tarabut_connector"),
         "frappe_version": _app_version("frappe"),
         "erpnext_version": _app_version("erpnext"),
-        "schema_version": "1",
+        "schema_version": "2",
         "roles": ["seller", "buyer"],
         "transports": ["direct"],
         "capabilities": {
