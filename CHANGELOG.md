@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1 - 2026-08-04
+
+- Keep the Frappe app version reported by `bench list-apps` and capability negotiation aligned with the published package and release version.
+
 ## 0.4.0 - 2026-08-04
 
 - Expand ERPNext Items into an explicit sellable-UOM catalogue contract with exact UOM prices, conversion factors, stock-UOM identity, barcodes, images, disabled state, and modification timestamps.
